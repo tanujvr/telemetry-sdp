@@ -1,0 +1,36 @@
+resources:
+  jobs:
+    telemetry_job:
+      name: telemetry-end-to-end
+      description: Simulate device telemetry into the landing volume, then refresh the Lakeflow pipeline.
+      # trigger:
+      #   periodic: { interval: 1, unit: HOURS }
+      parameters:
+        - name: landing_path
+          default: /Volumes/${var.catalog}/${resources.schemas.telemetry.name}/${resources.volumes.landing.name}
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: '2'
+      tasks:
+        - task_key: generate_telemetry
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/ingestion/generate_telemetry.py
+            parameters:
+              - "--base-path"
+              - "{{job.parameters.landing_path}}"
+              - "--devices"
+              - "50"
+              - "--batches"
+              - "3"
+              - "--events-per-batch"
+              - "2000"
+              - "--window-minutes"
+              - "60"
+        - task_key: run_pipeline
+          depends_on:
+            - task_key: generate_telemetry
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.telemetry_pipeline.id}
+            full_refresh: false

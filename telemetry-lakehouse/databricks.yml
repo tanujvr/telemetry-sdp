@@ -1,0 +1,42 @@
+# Databricks Asset Bundle: IoT telemetry lakehouse (Lakeflow Spark Declarative Pipelines)
+bundle:
+  name: telemetry_lakehouse
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Existing Unity Catalog catalog to deploy into
+    default: main
+  schema_name:
+    description: Schema that holds the landing volume and all pipeline tables
+    default: telemetry
+  alert_temp_max_c:
+    default: "85"
+  alert_vibration_max_mm_s:
+    default: "7.1"
+  alert_battery_min_pct:
+    default: "15"
+  alert_signal_min_dbm:
+    default: "-90"
+  dedup_watermark:
+    description: Max lateness tolerated by the silver de-duplication state
+    default: "2 hours"
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-5f11c572-773d.cloud.databricks.com/   # <-- change me
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-5f11c572-773d.cloud.databricks.com/   # <-- change me
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: prod
+    # run_as:
+    #   service_principal_name: <service-principal-application-id>

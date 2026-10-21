@@ -1,0 +1,14 @@
+resources:
+  schemas:
+    telemetry:
+      catalog_name: ${var.catalog}
+      name: ${var.schema_name}
+      comment: IoT telemetry lakehouse (bronze / silver / gold)
+
+  volumes:
+    landing:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.telemetry.name}
+      name: landing
+      volume_type: MANAGED
+      comment: Landing zone for raw telemetry and device registry JSON files

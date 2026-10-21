@@ -1,0 +1,19 @@
+resources:
+  pipelines:
+    telemetry_pipeline:
+      name: telemetry-lakeflow-pipeline
+      catalog: ${var.catalog}
+      schema: ${resources.schemas.telemetry.name}
+      serverless: true
+      continuous: false          # set true for always-on streaming
+      root_path: ../src/pipeline
+      libraries:
+        - glob:
+            include: ../src/pipeline/transformations/**
+      configuration:
+        landing_path: /Volumes/${var.catalog}/${resources.schemas.telemetry.name}/${resources.volumes.landing.name}
+        alert_temp_max_c: ${var.alert_temp_max_c}
+        alert_vibration_max_mm_s: ${var.alert_vibration_max_mm_s}
+        alert_battery_min_pct: ${var.alert_battery_min_pct}
+        alert_signal_min_dbm: ${var.alert_signal_min_dbm}
+        dedup_watermark: ${var.dedup_watermark}
